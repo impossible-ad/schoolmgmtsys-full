@@ -51,7 +51,7 @@ export const getAllTeacher = async (req, res, next) => {
         const [result] = await db.execute("SELECT * FROM TEACHER ");
         res.status(200).json({
             message: "all teacher's data retrieved",
-            data: result
+            teacher: result
         });
 
     } catch (error) {
