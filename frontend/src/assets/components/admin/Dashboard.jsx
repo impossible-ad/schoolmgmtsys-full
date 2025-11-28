@@ -23,8 +23,8 @@ const Dashboard = () => {
 
         <div className="h-screen flex ">
 
-            <div className="bg-blue-500 pt-3">
-                <Link to="/dashboard/teacher" className="text-black text-xl p-2 bg-amber-300 m-2 rounded-md">Teacher</Link>
+            <div className="bg-black pt-3">
+                <Link to="/dashboard/teacher" className="text-black text-xl p-2 bg-red-500 m-2 rounded-md">Teacher</Link>
             </div>
 
 

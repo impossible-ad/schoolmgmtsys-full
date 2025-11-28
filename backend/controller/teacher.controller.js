@@ -88,6 +88,7 @@ export const updateTeacher = async (req, res, next) => {
     try {
         const { name, email, phone, position } = req.body;
         const { id } = req.params;
+        console.log(req.body);
 
 
         //check if teacher exists
@@ -99,7 +100,7 @@ export const updateTeacher = async (req, res, next) => {
         }
         const oldTeacher = teacher[0];
 
-        const [teacherEmail] = await db.execute("SELECT * FROM teacher WHERE email=?", [email]);
+        const [teacherEmail] = await db.execute("SELECT * FROM teacher WHERE email=? where id=?", [email]);
         if (teacherEmail.length > 0) {
             return res.status(404).json({
                 message: "duplicate email found "
@@ -107,11 +108,12 @@ export const updateTeacher = async (req, res, next) => {
         }
 
 
-        await db.execute("UPDATE teacher SET name=?,email=?,phone=?,position=?", [
+        await db.execute("UPDATE teacher SET name=?,email=?,phone=?,position=? where id=?", [
             name ?? oldTeacher.name,
             email ?? oldTeacher.email,
             phone ?? oldTeacher.phone,
-            position ?? oldTeacher.position
+            position ?? oldTeacher.position,
+            id,
         ]);
 
         return res.status(200).json({

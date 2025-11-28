@@ -23,8 +23,26 @@ export const teacherAPIs = indexSlice.injectEndpoints({
                 body: data,
             }),
             invalidatesTags: ["teacher"]
-        })
-    })
-})
+        }),
 
-export const { useGetAllTeachersQuery, useAddTeacherMutation } = teacherAPIs;
+        deleteTeacher: builder.mutation({
+            query: (id) => ({
+                url: `/teacher/delete_teacher/${id}`,
+                method: "DELETE"
+
+            }),
+            invalidatesTags: ["teacher"],
+        }),
+
+        updateTeacher: builder.mutation({
+            query: ({ id, data }) => ({
+                url: `/teacher/update_teacher/${id}`,
+                method: "PATCH",
+                body: data,
+
+            }), invalidatesTags: ["teacher"],
+        }),
+    }),
+});
+
+export const { useGetAllTeachersQuery, useAddTeacherMutation, useDeleteTeacherMutation, useUpdateTeacherMutation } = teacherAPIs;

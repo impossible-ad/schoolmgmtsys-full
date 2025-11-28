@@ -1,10 +1,28 @@
 import { toast } from "react-toastify";
-import { useGetAllTeachersQuery } from "../../../../redux/features/teacherSlice";
+import { useDeleteTeacherMutation, useGetAllTeachersQuery, useUpdateTeacherMutation, } from "../../../../redux/features/teacherSlice";
 import Loading from "../../shared/Loading";
+import { useState } from "react";
 
 const TeacherDashB = () => {
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [teacherId, setTeacherId] = useState();
+    // const [selectedTeacher, setSelectedTeacher] = useState(null);
     const { data, isLoading, error } = useGetAllTeachersQuery();
+    const [deleteTeacher] = useDeleteTeacherMutation();
+    const [updateTeacher] = useUpdateTeacherMutation();
+
+    const [formData, setFormData] = useState({
+        name: "", email: "", position: "", phone: ""
+    });
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData((prev) => ({
+            ...prev, //spread operator
+            [id]: value
+        }));
+    }
 
     if (isLoading) {
         return <Loading />
@@ -14,13 +32,40 @@ const TeacherDashB = () => {
 
     const teachers = data?.teacher;
 
-    const handleDelete = () => {
-        toast.error("Delete functionality not implemented yet!");
+    const handleDelete = async (teacher) => {
+        setTeacherId(teacher.id);
+        try {
+            await deleteTeacher(teacherId).unwrap();
+            toast.success(`${teacher.name} deleted successfully`);
+
+        } catch (error) {
+            toast.error(`Failed to delete ${teacher.name}`);
+        }
     }
 
-    const handleEdit = () => {
-        toast.error("Edit functionality not implemented yet!");
+
+    const handleEdit = async (teacher) => {
+        setIsModalOpen(true);
+        setTeacherId(teacher.id);
+        setFormData({
+            name: teacher.name,
+            email: teacher.email,
+            position: teacher.position,
+            phone: teacher.phone
+        })
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await updateTeacher({ id: teacherId, data: formData }).unwrap();
+            toast.success(`${formData.name} 's data updated successfully`);
+            setIsModalOpen(false);
+
+        } catch (error) {
+            toast.error("Update Failed!");
+        }
     }
+
 
 
     return (
@@ -55,8 +100,8 @@ const TeacherDashB = () => {
                                 <td className="px-6 py-4 text-sm text-gray-700">{teacher.phone}</td>
                                 <td className="px-6 py-4 text-sm text-gray-700">
                                     <div className="space-x-4">
-                                        <button onClick={handleDelete} className="cursor-pointer">Delete</button>
-                                        <button onClick={handleEdit} className="cursor-pointer">Edit</button>
+                                        <button onClick={() => handleDelete(teacher)} className="cursor-pointer">Delete</button>
+                                        <button onClick={() => handleEdit(teacher)} className="cursor-pointer">Edit</button>
                                     </div>
                                 </td>
 
@@ -69,6 +114,63 @@ const TeacherDashB = () => {
                     <p className="p-4 text-center text-gray-500">No teacher data found</p>
                 )}
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg w-96">
+                        <h2 className="text-xl font-bold mb-4">Edit Teacher</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input
+                                type="text"
+                                id="name"
+                                value={formData.name || ""}
+                                placeholder="Name"
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded mb-3"
+                            />
+                            <input
+                                type="email"
+                                id="email"
+                                value={formData.email || ""}
+                                placeholder="Email"
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded mb-3"
+                            />
+                            <input
+                                type="text"
+                                id="position"
+                                value={formData.position || ""}
+                                placeholder="Position"
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded mb-3"
+                            />
+                            <input
+                                type="text"
+                                id="phone"
+                                value={formData.phone || ""}
+                                placeholder="Phone"
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded mb-3"
+                            />
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    type="button" className="px-4 py-2 bg-gray-300 rounded">
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                                >
+                                    Update
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
+            )}
         </div>
     );
 
