@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const TeacherDashB = () => {
 
+    const [originalData, setOriginalData] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [teacherId, setTeacherId] = useState();
     // const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -30,12 +31,12 @@ const TeacherDashB = () => {
     if (error) return <p className="p-4 text-red-600">Failed to load teachers!</p>;
 
 
-    const teachers = data?.teacher;
+    const teachers = data?.teacher || [];
 
     const handleDelete = async (teacher) => {
         setTeacherId(teacher.id);
         try {
-            await deleteTeacher(teacherId).unwrap();
+            await deleteTeacher(teacher.id).unwrap();
             toast.success(`${teacher.name} deleted successfully`);
 
         } catch (error) {
@@ -47,6 +48,7 @@ const TeacherDashB = () => {
     const handleEdit = async (teacher) => {
         setIsModalOpen(true);
         setTeacherId(teacher.id);
+        setOriginalData(teacher);
         setFormData({
             name: teacher.name,
             email: teacher.email,
@@ -56,13 +58,33 @@ const TeacherDashB = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const updatedData = {};
+        if (formData.name !== originalData.name) {
+            updatedData.name = formData.name;
+        }
+        if (formData.email !== originalData.email) {
+            updatedData.email = formData.email;
+        }
+        if (formData.phone !== originalData.phone) {
+            updatedData.phone = formData.phone;
+        }
+        if (formData.position !== originalData.position) {
+            updatedData.position = formData.position;
+        }
+        if (Object.keys(updatedData).length === 0) {
+            toast.info("No changes made.");
+            return;
+        }
+
         try {
-            await updateTeacher({ id: teacherId, data: formData }).unwrap();
-            toast.success(`${formData.name} 's data updated successfully`);
+            const res = await updateTeacher({ id: teacherId, data: updatedData }).unwrap();
+            await updateTeacher({ id: teacherId, data: updatedData }).unwrap();
+            toast.success(res.message || `${formData.name} 's data updated successfully`);
             setIsModalOpen(false);
 
         } catch (error) {
-            toast.error("Update Failed!");
+            toast.error(error?.data?.message || "Update Failed!");
         }
     }
 

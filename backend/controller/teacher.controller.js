@@ -86,43 +86,54 @@ export const deleteTeacher = async (req, res, next) => {
 
 export const updateTeacher = async (req, res, next) => {
     try {
-        const { name, email, phone, position } = req.body;
         const { id } = req.params;
-        console.log(req.body);
+        const { name, email, phone, position } = req.body;
 
+        // Check if teacher exists
+        const [existing] = await db.execute(
+            "SELECT * FROM teacher WHERE id = ?",
+            [id]
+        );
 
-        //check if teacher exists
-        const [teacher] = await db.execute("SELECT * FROM teacher WHERE id=?", [id]);
-        if (teacher.length === 0) {
+        if (existing.length === 0) {
             return res.status(404).json({
-                message: "teacher not found"
-            });
-        }
-        const oldTeacher = teacher[0];
-
-        const [teacherEmail] = await db.execute("SELECT * FROM teacher WHERE email=? where id=?", [email]);
-        if (teacherEmail.length > 0) {
-            return res.status(404).json({
-                message: "duplicate email found "
+                message: `Teacher not found with id ${id}`,
             });
         }
 
+        const teacher = existing[0];
 
-        await db.execute("UPDATE teacher SET name=?,email=?,phone=?,position=? where id=?", [
-            name ?? oldTeacher.name,
-            email ?? oldTeacher.email,
-            phone ?? oldTeacher.phone,
-            position ?? oldTeacher.position,
-            id,
-        ]);
+        // Use existing values if not provided
+        const updatedName = name || teacher.name;
+        const updatedEmail = email || teacher.email;
+        const updatedPhone = phone || teacher.phone;
+        const updatedPosition = position || teacher.position;
+
+        // Check if email already exists for another teacher
+        if (email && email !== teacher.email) {
+            const [emailCheck] = await db.execute(
+                "SELECT id FROM teacher WHERE email = ? AND id != ?",
+                [email, id]
+            );
+
+            if (emailCheck.length > 0) {
+                return res.status(409).json({
+                    message: "Email already exists. Use another email.",
+                });
+            }
+        }
+
+        // Update teacher
+        await db.execute(
+            "UPDATE teacher SET name = ?, email = ?, phone = ?, position = ? WHERE id = ?",
+            [updatedName, updatedEmail, updatedPhone, updatedPosition, id]
+        );
 
         return res.status(200).json({
-            message: "teacher updated"
+            message: "Teacher updated successfully",
         });
-
-
     } catch (error) {
         next(error);
     }
+};
 
-}
