@@ -1,7 +1,15 @@
 import { toast } from "react-toastify";
-import { useDeleteTeacherMutation, useGetAllTeachersQuery, useUpdateTeacherMutation, } from "../../../../redux/features/teacherSlice";
+import { useAddTeacherMutation, useDeleteTeacherMutation, useGetAllTeachersQuery, useUpdateTeacherMutation, } from "../../../../redux/features/teacherSlice";
 import Loading from "../../shared/Loading";
 import { useState } from "react";
+
+
+const initialData = {
+    name: "",
+    email: "",
+    position: "",
+    phone: "",
+};
 
 const TeacherDashB = () => {
 
@@ -12,10 +20,10 @@ const TeacherDashB = () => {
     const { data, isLoading, error } = useGetAllTeachersQuery();
     const [deleteTeacher] = useDeleteTeacherMutation();
     const [updateTeacher] = useUpdateTeacherMutation();
+    const [addTeacher] = useAddTeacherMutation();
+    const [isAdding, setIsAdding] = useState(false);
+    const [formData, setFormData] = useState(initialData);
 
-    const [formData, setFormData] = useState({
-        name: "", email: "", position: "", phone: ""
-    });
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -46,6 +54,7 @@ const TeacherDashB = () => {
 
 
     const handleEdit = async (teacher) => {
+        setIsAdding(false);
         setIsModalOpen(true);
         setTeacherId(teacher.id);
         setOriginalData(teacher);
@@ -58,6 +67,19 @@ const TeacherDashB = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isAdding) {
+            try {
+                const res = await addTeacher(formData).unwrap();
+                toast.success(res.message || "Teacher added successfully");
+                setFormData(initialData);
+                setIsModalOpen(false);
+
+            } catch (error) {
+                toast.error(error.data?.message || "failed to add Teacher")
+            }
+            return;
+        }
 
         const updatedData = {};
         if (formData.name !== originalData.name) {
@@ -88,12 +110,25 @@ const TeacherDashB = () => {
         }
     }
 
+    const handleAddTeacher = () => {
+        setIsModalOpen(true);
+        setIsAdding(true);
+        setTeacherId(null);
+        setOriginalData({});
+        setFormData(initialData);
 
+    }
 
     return (
 
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
+
+            <div className="flex justify-between mb-6">
+                <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
+                <button onClick={handleAddTeacher}
+                    className="cursor-pointer bg-blue-600 text-white px-3 rounded-full">Add Teacher
+                </button>
+            </div>
 
             <div className="overflow-x-auto bg-white rounded-lg shadow">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -139,7 +174,7 @@ const TeacherDashB = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">Edit Teacher</h2>
+                        <h2 className="text-xl font-bold mb-4">{isAdding ? "ADD" : "EDIT"} Teacher</h2>
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"
@@ -183,7 +218,7 @@ const TeacherDashB = () => {
                                     type="submit"
                                     className="px-4 py-2 bg-blue-600 text-white rounded"
                                 >
-                                    Update
+                                    {isAdding ? "ADD" : "EDIT"} Teacher
                                 </button>
                             </div>
                         </form>

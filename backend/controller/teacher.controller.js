@@ -3,7 +3,6 @@ import db from "../config/dbconnect.js";
 export const addTeacher = async (req, res, next) => {
     try {
         const { name, email, phone, position } = req.body;
-        //console.log(req.body);
 
         if (!name || !email || !phone || !position) {
             return res.status(401).json({

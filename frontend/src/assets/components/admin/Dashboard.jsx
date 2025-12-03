@@ -2,12 +2,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/features/authState";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useSignoutMutation } from "../../../redux/features/authSlice";
+
 
 const Dashboard = () => {
 
     const { email, isAuth } = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [signout] = useSignoutMutation();
+
 
     useEffect(() => {
         if (!isAuth) {
@@ -15,8 +20,19 @@ const Dashboard = () => {
         }
     }, [isAuth]);
 
-    const handlelogout = () => {
+    const handlelogout = async () => {
         dispatch(logout());
+
+        try {
+            const res = await signout().unwrap();
+            toast.success(res.message || "Logged out Successfully");
+            navigate("/");
+
+        } catch (error) {
+            toast.error(error.data?.message || "Logout Failed");
+        }
+
+
     };
 
     return (
