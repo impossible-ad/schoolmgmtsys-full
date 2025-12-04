@@ -14,6 +14,7 @@ dotenv.config();
 const app = express();
 const port = process.env.port;
 
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
@@ -27,6 +28,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/teacher", teacherRouter);
 app.use("/api/vacancy", vacancyRouter);
 app.use(globalErrorHandler);
+app.use("/uploads", express.static("uploads"));
+
 
 try {
     await db.connect();

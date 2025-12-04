@@ -134,7 +134,7 @@ const TeacherDashB = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Image</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Position</th>
@@ -150,7 +150,13 @@ const TeacherDashB = () => {
                     <tbody className="bg-white divide-y divide-gray-200">
                         {teachers.map((teacher) => (
                             <tr key={teacher.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-sm text-gray-800">{teacher.id}</td>
+                                <td className="px-6 py-4 text-sm text-gray-800">
+                                    <img
+                                        src={`${import.meta.env.VITE_IMG_URL}/${teacher.img}`}
+                                        alt={teacher.img ? teacher.name : "No Image"}
+                                        className="w-12 h-12 object-cover"
+                                    />
+                                </td>
                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">{teacher.name}</td>
                                 <td className="px-6 py-4 text-sm text-blue-600">{teacher.email}</td>
                                 <td className="px-6 py-4 text-sm text-gray-700">{teacher.position}</td>

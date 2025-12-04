@@ -11,7 +11,8 @@ id int auto_increment primary key,
 name varchar(100) not null,
 email varchar(255) NOT null unique,
 position varchar(255) not null,
-phone varchar(20) not null
+phone varchar(20) not null,
+img VARCHAR(255) NULL,
 );
 
 create table vacancy (
@@ -22,3 +23,5 @@ create table vacancy (
 created _at timestamp default current_timestamp
 );
 
+//Use school_management_system:
+ALTER TABLE teacher ADD column img VARCHAR(255) NULL;//

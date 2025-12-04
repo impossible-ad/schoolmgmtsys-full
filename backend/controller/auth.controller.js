@@ -25,6 +25,7 @@ export const getAllUsers = async (req, res, next) => {
 
 //login api
 export const login = async (req, res, next) => {
+
     try {
         //1.get email and password from user side
         const { email, password } = req.body;

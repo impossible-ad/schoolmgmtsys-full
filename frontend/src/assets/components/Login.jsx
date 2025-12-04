@@ -4,10 +4,13 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/features/authState';
+import { useLoginMutation } from '../../redux/features/authSlice';
 
 export const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [login] = useLoginMutation();
+
     const [formData, setFormData] = useState({
         email: "", password: ""
     });
@@ -29,23 +32,11 @@ export const Login = () => {
         //console.log("This data is for backend:", formData);
 
         try {
-            const res = await fetch("http://localhost:5000/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include", //to include cookies
-                body: JSON.stringify(formData)
-            });
-
-            const data = await res.json();
+            const data = await login(formData).unwrap();
             toast.success(`${data.message}`);
             dispatch(setUser(data?.user.email));
 
-
-            if (res.status === 200) {
-                navigate("/dashboard");
-            }
+            return navigate("/dashboard");
 
         } catch (error) {
             toast.error("something Wrong");
