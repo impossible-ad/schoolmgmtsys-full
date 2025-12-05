@@ -88,13 +88,16 @@ export const deleteTeacher = async (req, res, next) => {
         const { id } = req.params;
 
         const [givenid] = await db.execute(
-            "SELECT id FROM teacher where id =?", [id]
+            "SELECT id,img FROM teacher where id =?", [id]
         );
 
         if (givenid.length === 0) {
             return res.status(404).json({
                 message: `teacher with ${id} id not found`
             });
+        }
+        if (givenid[0].img) {
+            removeImg(`uploads/teacher/${givenid[0].img.split("/").pop()}`);
         }
 
         await db.execute("DELETE FROM teacher WHERE id =?", [id]);

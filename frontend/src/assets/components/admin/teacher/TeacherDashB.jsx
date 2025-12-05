@@ -9,6 +9,7 @@ const initialData = {
     email: "",
     position: "",
     phone: "",
+    image: "",
 };
 
 const TeacherDashB = () => {
@@ -32,6 +33,14 @@ const TeacherDashB = () => {
             [id]: value
         }));
     }
+
+    const handleFileChange = (e) => {
+        setFormData((prev) => ({
+            ...prev, //spread operator
+            image: e.target.files[0],
+        }));
+    }
+
 
     if (isLoading) {
         return <Loading />
@@ -62,15 +71,24 @@ const TeacherDashB = () => {
             name: teacher.name,
             email: teacher.email,
             position: teacher.position,
-            phone: teacher.phone
+            phone: teacher.phone,
+
+
         })
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (isAdding) {
+
+            const multerData = new FormData();
+            multerData.append("name", formData.name);
+            multerData.append("email", formData.email);
+            multerData.append("position", formData.position);
+            multerData.append("phone", formData.phone);
+            multerData.append("image", formData.image);
             try {
-                const res = await addTeacher(formData).unwrap();
+                const res = await addTeacher(multerData).unwrap();
                 toast.success(res.message || "Teacher added successfully");
                 setFormData(initialData);
                 setIsModalOpen(false);
@@ -178,7 +196,7 @@ const TeacherDashB = () => {
                 )}
             </div>
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg w-96">
                         <h2 className="text-xl font-bold mb-4">{isAdding ? "ADD" : "EDIT"} Teacher</h2>
                         <form onSubmit={handleSubmit}>
@@ -213,6 +231,15 @@ const TeacherDashB = () => {
                                 placeholder="Phone"
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded mb-3"
+                            />
+
+                            <input
+                                type="file"
+                                id="image"
+                                //value={formData.image}
+                                onChange={handleFileChange}
+                                className="mb-4 border w-full px-2 py-3 rounded-sm"
+                                required={isAdding}
                             />
                             <div className="flex justify-end space-x-2">
                                 <button
