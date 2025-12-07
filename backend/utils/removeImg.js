@@ -1,5 +1,6 @@
 import fs from "fs";
 export const removeImg = (path) => {
+
     try {
         if (fs.existsSync(path)) {
             fs.unlinkSync(path);
@@ -8,6 +9,5 @@ export const removeImg = (path) => {
         console.log(`file not found:${path}`)
 
     }
-
 
 }

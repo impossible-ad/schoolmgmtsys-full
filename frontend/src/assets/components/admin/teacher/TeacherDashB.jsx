@@ -72,8 +72,7 @@ const TeacherDashB = () => {
             email: teacher.email,
             position: teacher.position,
             phone: teacher.phone,
-
-
+            image: teacher.img,
         })
     };
     const handleSubmit = async (e) => {
@@ -99,20 +98,23 @@ const TeacherDashB = () => {
             return;
         }
 
-        const updatedData = {};
+        const updatedData = new FormData();
         if (formData.name !== originalData.name) {
-            updatedData.name = formData.name;
+            updatedData.append("name", formData.name);
         }
         if (formData.email !== originalData.email) {
-            updatedData.email = formData.email;
+            updatedData.append("email", formData.email);
         }
         if (formData.phone !== originalData.phone) {
-            updatedData.phone = formData.phone;
+            updatedData.append("phone", formData.phone);
         }
         if (formData.position !== originalData.position) {
-            updatedData.position = formData.position;
+            updatedData.append("position", formData.position);
         }
-        if (Object.keys(updatedData).length === 0) {
+        if (formData.image) {
+            updatedData.append("image", formData.image);
+        }
+        if (updatedData.length === 0) {
             toast.info("No changes made.");
             return;
         }
@@ -233,6 +235,17 @@ const TeacherDashB = () => {
                                 className="w-full p-2 border rounded mb-3"
                             />
 
+                            {formData.image ? (
+                                <img
+                                    src={`${import.meta.env.VITE_IMG_URL}/${formData.image}`}
+                                    alt={formData.name}
+                                    className=" object-cover rounded" />
+                            ) : (
+                                <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded text-xs">
+                                    No Image
+                                </div>
+
+                            )}
                             <input
                                 type="file"
                                 id="image"

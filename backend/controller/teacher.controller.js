@@ -111,6 +111,7 @@ export const deleteTeacher = async (req, res, next) => {
 
 
 export const updateTeacher = async (req, res, next) => {
+    console.log(req.file);
     try {
         const { id } = req.params;
         const { name, email, phone, position } = req.body;
@@ -122,6 +123,10 @@ export const updateTeacher = async (req, res, next) => {
         );
 
         if (existing.length === 0) {
+            if (req.file) {
+                removeImg(req.file.path);
+            }
+
             return res.status(404).json({
                 message: `Teacher not found with id ${id}`,
             });
@@ -134,6 +139,7 @@ export const updateTeacher = async (req, res, next) => {
         const updatedEmail = email || teacher.email;
         const updatedPhone = phone || teacher.phone;
         const updatedPosition = position || teacher.position;
+        const updatedImage = image || teacher.image;
 
         // Check if email already exists for another teacher
         if (email && email !== teacher.email) {
@@ -143,22 +149,39 @@ export const updateTeacher = async (req, res, next) => {
             );
 
             if (emailCheck.length > 0) {
+                if (req.file) {
+                    removeImg(req.file.path);
+                }
                 return res.status(409).json({
                     message: "Email already exists. Use another email.",
                 });
             }
         }
 
+        let updatedImg = teacher.img;
+
+        if (req.file) {
+            updatedImg = `uploads/teacher/${req.file.filename}`;
+
+
+            if (teacher.img) {
+                removeImg(`uploads/teacher/${teacher.img.split("/").pop()}`);
+            }
+        }
+
         // Update teacher
         await db.execute(
-            "UPDATE teacher SET name = ?, email = ?, phone = ?, position = ? WHERE id = ?",
-            [updatedName, updatedEmail, updatedPhone, updatedPosition, id]
+            "UPDATE teacher SET name = ?, email = ?, phone = ?, position = ?, img=? WHERE id = ?",
+            [updatedName, updatedEmail, updatedPhone, updatedPosition, updatedImg, id]
         );
 
         return res.status(200).json({
             message: "Teacher updated successfully",
         });
     } catch (error) {
+        if (req.file) {
+            removeImg(req.file.path);
+        }
         next(error);
     }
 };
