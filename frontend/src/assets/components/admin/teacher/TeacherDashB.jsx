@@ -7,6 +7,7 @@ import {
 } from "../../../../redux/features/teacherSlice";
 import Loading from "../../shared/Loading";
 import { useState } from "react";
+import Pagination from "../../shared/pagination";
 
 const initialData = {
   name: "",
@@ -21,12 +22,18 @@ const TeacherDashB = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherId, setTeacherId] = useState();
   // const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const { data, isLoading, error } = useGetAllTeachersQuery();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useGetAllTeachersQuery({
+    page,
+    limit: 5,
+  });
   const [deleteTeacher] = useDeleteTeacherMutation();
   const [updateTeacher] = useUpdateTeacherMutation();
   const [addTeacher] = useAddTeacherMutation();
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState(initialData);
+
+  const totalPages = data?.totalPages;
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -225,6 +232,9 @@ const TeacherDashB = () => {
           <p className="p-4 text-center text-gray-500">No teacher data found</p>
         )}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">

@@ -4,7 +4,14 @@ import { removeImg } from "../utils/removeImg.js";
 
 export const addTeacher = async (req, res, next) => {
   // return res.json({ file: req.file });
+  const { role } = req.user;
   try {
+    if (role !== "admin") {
+      return res.status(403).json({
+        message: "Access Denied",
+      });
+    }
+
     const { name, email, phone, position } = req.body;
 
     if (!name || !email || !phone || !position) {
@@ -67,6 +74,7 @@ export const addTeacher = async (req, res, next) => {
 
 export const getAllTeacher = async (req, res, next) => {
   try {
+    // let { page = "", limit = "" } = req.query;
     let { page = 1, limit = 5 } = req.query;
 
     page = Number(page);
