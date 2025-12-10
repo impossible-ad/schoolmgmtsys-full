@@ -8,6 +8,7 @@ import {
 import Loading from "../../shared/Loading";
 import { useState } from "react";
 import Pagination from "../../shared/pagination";
+import { useSelector } from "react-redux";
 
 const initialData = {
   name: "",
@@ -18,6 +19,7 @@ const initialData = {
 };
 
 const TeacherDashB = () => {
+  const { role } = useSelector((state) => state.user);
   const [originalData, setOriginalData] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherId, setTeacherId] = useState();
@@ -208,20 +210,22 @@ const TeacherDashB = () => {
                   {teacher.phone}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  <div className="space-x-4">
-                    <button
-                      onClick={() => handleDelete(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleEdit(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                  </div>
+                  {role == "admin" && (
+                    <div className="space-x-4">
+                      <button
+                        onClick={() => handleDelete(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => handleEdit(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}

@@ -5,14 +5,8 @@ import { compressImg } from "../utils/sharphandler.js";
 
 export const addTeacher = async (req, res, next) => {
   // return res.json({ file: req.file });
-  const { role } = req.user;
-  try {
-    if (role !== "admin") {
-      return res.status(403).json({
-        message: "Access Denied",
-      });
-    }
 
+  try {
     const { name, email, phone, position } = req.body;
 
     if (!name || !email || !phone || !position) {
