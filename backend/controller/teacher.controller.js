@@ -1,6 +1,7 @@
 import db from "../config/dbconnect.js";
 
 import { removeImg } from "../utils/removeImg.js";
+import { compressImg } from "../utils/sharphandler.js";
 
 export const addTeacher = async (req, res, next) => {
   // return res.json({ file: req.file });
@@ -56,7 +57,12 @@ export const addTeacher = async (req, res, next) => {
       });
     }
 
-    const imagePath = req.file ? `uploads/teacher/${req.file.filename}` : null;
+    let imagePath = "";
+    if (req.file) {
+      const outputPath = `uploads/teacher/school-${req.file.filename}`;
+      await compressImg(req.file.path, outputPath);
+      imagePath = outputPath;
+    }
 
     //insert teacher
     await db.execute(
